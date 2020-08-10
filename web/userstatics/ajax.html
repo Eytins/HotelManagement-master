@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+</head>
+<body>
+<input type="button" id="btn01"  value="获取ajax">
+<script>
+    $("#btn01").click=function () {
+        console.log("begin:")
+        $.ajax({
+            dataType: "json",
+            url: "http://localhost:8080/billorder/doUserHotelSearch",
+            type: "post",
+            data: {"name":"zhangsan"},
+            success: function (result) {
+                console.log("----------", result, "-------");
+            },
+            error: function (result) {
+                alert("请求出错");
+                alert(result);
+            }
+        })
+    }
+</script>
+</body>
+</html>

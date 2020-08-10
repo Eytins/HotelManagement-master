@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html class="x-admin-sm">
+
+<head>
+    <meta charset="UTF-8">
+    <title>编辑房间</title>
+    <meta content="webkit" name="renderer">
+    <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+    <meta content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi"
+          name="viewport"/>
+    <link href="../statics/css/font.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://cdn.bootcss.com/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+    <link href="../statics/css/xadmin.css" rel="stylesheet">
+    <script charset="utf-8" src="../statics/lib/layui/layui.js" type="text/javascript"></script>
+    <script src="../statics/js/xadmin.js" type="text/javascript"></script>
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+    <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+    <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+<div class="layui-fluid">
+    <div class="layui-row">
+        <!--todo:action要改-->
+        <form action="${pageContext.request.contextPath}/doOrder.html" class="layui-form" id="roomEdit">
+
+            <input type="hidden" id="roomId" name="roomId">
+            <script type="text/javascript">$("#roomId").val($.cookie("roomId"))</script>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">房型编号</label>
+                <label class="layui-form-label"><script type="text/javascript">document.write($.cookie("roomId"));</script></label>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">房型名称</label>
+                <label class="layui-form-label"><script type="text/javascript">document.write($.cookie("hotelRoomType"));</script></label>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">剩余房间数</label>
+                <label class="layui-form-label"><script type="text/javascript">document.write($.cookie("remainRoomNumber"));</script></label>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label" for="roomPrice">每晚价格</label>
+                <div class="layui-input-inline">
+                    <input autocomplete="off" class="layui-input" id="roomPrice" name="roomPrice" required=""
+                           type="number"></div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label" for="numberOfPerson">可住人数</label>
+                <div class="layui-input-inline">
+                    <input autocomplete="off" class="layui-input" id="numberOfPerson" name="numberOfPerson" required=""
+                           type="number"></div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label"></label>
+                <button id="select" class="layui-btn" lay-submit="" type="submit">修改</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script>layui.use(['form', 'layer', 'jquery'],
+    function () {
+        $ = layui.jquery;
+        var form = layui.form,
+            layer = layui.layer;
+
+
+        //监听提交
+        form.on('submit(add)',
+            function (data) {
+                console.log(data);
+                //发异步，把数据提交给php
+                layer.alert("增加成功", {
+                        icon: 6
+                    },
+                    function () {
+                        //关闭当前frame
+                        xadmin.close();
+
+                        // 可以对父窗口进行刷新
+                        xadmin.father_reload();
+                    });
+                return false;
+            });
+
+    });</script>
+<script>var _hmt = _hmt || [];
+(function () {
+    var hm = document.createElement("script");
+    hm.src = "https://hm.baidu.com/hm.js?b393d153aeb26b46e9431fabaf0f6190";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+})();
+
+$("#select").click(function () {
+    var formData = $("#roomEdit").serialize();
+    $.ajax({
+        dataType:"",
+        url: "http://localhost:8080/HotelManagement_war_exploded/hotelroom/editHotelRoom",
+        type: "post",
+        data: formData,
+        success: function (result) {
+            alert("修改成功");
+            result;
+        },
+        error: function (result) {
+            alert("运行成功");
+            result;
+        }
+    });
+    return false;
+});
+
+</script>
+</body>
+
+</html>

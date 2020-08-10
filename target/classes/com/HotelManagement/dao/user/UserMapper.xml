@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.HotelManagement.dao.user.UserMapper">
+
+    <select id="getUserByUserCode" resultType="com.HotelManagement.pojo.User">
+        select * from HotelManagement.user
+        <where>
+            <if test="userCode!=null and userCode!=''">
+                userCode = #{userCode}
+            </if>
+        </where>
+    </select>
+
+
+    <insert id="addUser" parameterType="com.HotelManagement.pojo.User">
+        insert into HotelManagement.user (userCode, userName, userPassword, gender, birthday, phone, userRole)
+        values (#{userCode}, #{userName}, #{userPassword}, #{gender}, #{birthday}, #{phone}, #{userRole})
+    </insert>
+
+    <select id="getUserRole" resultType="java.lang.Integer">
+        select userRole
+        from user
+        where userCode = #{userCode}
+    </select>
+
+    <!--根据用户名和用户角色获得用户列表-->
+    <select id="getUserList" resultMap="rm_includeRoleName">
+        select u.*,r.roleName
+        from user u,role r
+        where u.userRole=r.id
+        <if test="userName!=null and userName!=''">
+            and u.userName like CONCAT('%',#{userName},'%')
+        </if>
+        <if test="userRole!=null and userRole!=''">
+            and u.userRole=#{userRole}
+        </if>
+
+    </select>
+
+    <resultMap id="rm_includeRoleName" type="User">
+        <result property="userRoleName" column="roleName"/>
+    </resultMap>
+
+
+
+    <!--获得角色列表-->
+    <select id="getRoleList" resultType="Role">
+        select * from role
+    </select>
+
+
+    <delete id="deleteUserByUserCode" parameterType="String">
+        delete
+        from user
+        where userCode = #{userCode}
+    </delete>
+</mapper>

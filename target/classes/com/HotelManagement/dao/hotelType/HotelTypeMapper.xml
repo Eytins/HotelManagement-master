@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.HotelManagement.dao.hotelType.HotelTypeMapper">
+
+    <insert id="addNewHotelType" parameterType="HotelType">
+        insert into hotelType(hotelId, hotelRoomType, hotelRoomNumber, hotelPrice, hotelPeople, creationDate,
+                              modifyDate)
+        values (#{hotelId}, #{hotelRoomType}, #{hotelRoomNumber}, #{hotelPrice}, #{hotelPeople}, #{creationDate},
+                #{modifyDate})
+    </insert>
+
+    <delete id="deleteHotelType" parameterType="int">
+        delete
+        from hotelType
+        where id = #{id}
+    </delete>
+
+    <select id="selectHotelTypeByIdType" resultType="com.HotelManagement.pojo.HotelType">
+        select * from hotelType
+        <where>
+            <if test="hotelRoomType!=null and hotelRoomType!=''">
+                hotelRoomType LIKE CONCAT('%',#{hotelRoomType},'%')
+            </if>
+            <if test="hotelId!=null and hotelId!=''">
+                and hotelId = #{hotelId}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectRemainNumber" resultType="java.lang.Integer">
+        select h.hotelRoomNumber -
+               (select count(*) from bill b where b.hotelId = #{hotelId} and b.roomType = #{hotelTypeId})
+        from hotelType h,
+             bill b
+        where h.hotelId = #{hotelId}
+          and h.id = #{hotelTypeId}
+        LIMIT 1;
+    </select>
+
+    <select id="selectByUser" resultType="list" resultMap="midd">
+        select ht.*,h.hotelName,h.hotelAddress from hotelType ht,hotel h
+        <where>
+            <if test="priceMin!=null and priceMin!=''">ht.hotelPrice>#{priceMin}</if>
+            <if test="priceMax!=null and priceMax!=''">and #{priceMax}>ht.hotelPrice</if>
+            <if test="hotelAddress!=null and hotelAddress!=''">and h.hotelAddress LIKE CONCAT('%',#{hotelAddress},'%')
+            </if>
+            <if test="hotelName!=null and hotelName!=''">and h.hotelName LIKE CONCAT('%',#{hotelName},'%')</if>
+            and ht.hotelId = h.id
+        </where>
+    </select>
+
+
+    <resultMap id="midd" type="HotelType">
+        <result property="hotelName" column="hotelName"/>
+        <result property="hotelAddress" column="hotelAddress"/>
+    </resultMap>
+
+    <update id="modifyRoomType">
+        update hotelType
+        <trim prefix="set" suffix="where id=#{roomTypeId}" suffixOverrides=",">
+            <if test="numberOfPerson!=null">hotelPeople=#{numberOfPerson},</if>
+            <if test="roomTypeId!=null">hotelPrice=#{price},</if>
+        </trim>
+    </update>
+</mapper>

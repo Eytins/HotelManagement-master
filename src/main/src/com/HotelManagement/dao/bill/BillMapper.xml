@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.HotelManagement.dao.bill.BillMapper">
+
+
+    <!--根据订单编号和房间类型获得订单列表-->
+    <select id="getBillByBillCode" resultType="Bill">
+        select * from bill
+        <where>
+            <if test="billCode!=null and billCode!=''">
+                and billCode like CONCAT('%',#{billCode},'%')
+            </if>
+            <if test="roomType!=null and roomType!=''">
+                and roomType like CONCAT('%',#{roomType},'%')
+            </if>
+        </where>
+    </select>
+
+    <!--添加订单-->
+    <insert id="addBill" parameterType="Bill">
+        insert into bill(billCode, orderId, hotelId, roomType, checkInDate, checkOutDate, isCheckIn, countDays,
+                         totalPrice, isPayment, providerId)
+        values (#{billCode}, #{orderId}, #{hotelId}, #{roomType}, #{checkInDate}, #{checkOutDate},
+                #{isCheckIn},#{countDays}, #{totalPrice}, #{isPayment}, #{providerId})
+    </insert>
+
+    <!--根据id删除订单信息-->
+    <delete id="deleteBillById" parameterType="integer">
+        delete
+        from bill
+        where id = #{billId}
+    </delete>
+
+    <delete id="deleteBillByCode" parameterType="string">
+        delete
+        from bill
+        where billCode = #{billCode}
+    </delete>
+
+    <!--获取订单最高价格-->
+    <select id="HPrice" parameterType="Integer" resultType="java.lang.Integer">
+        select MAX(totalPrice)
+        FROM bill;
+    </select>
+
+    <!--获取订单最低价格-->
+    <select id="LPrice" parameterType="Integer" resultType="java.lang.Integer">
+        select Min(totalPrice)
+        FROM bill;
+    </select>
+
+    <!--获得包含房间类型和房间规格的订单列表-->
+
+    <select id="getBillListWithType" resultType="com.HotelManagement.pojo.Bill" resultMap="mid">
+        select b.*,h.hotelRoomType,h.hotelPeople
+        from bill u,hotelType h
+        where b.roomType=h.id
+        <if test="billCode!=null and billCode!=''">
+            billCode = #{billCode}
+        </if>
+        <if test="roomType!=null and roomType!=''">
+            roomType = #{roomType}
+        </if>
+    </select>
+
+    <select id="getBillListAndHotelNameByDateAndHotelNameAndAddress" resultMap="hid">
+        select b.*,h.hotelName from bill b,hotel h
+        where h.id=b.hotelId
+        <if test="date!=null">
+            #{date} between checkInDate and checkOutDate
+        </if>
+        <if test="hotelName!=null and hotelName!=''">
+            and hotelName like CONCAT('%',#{hotelName},'%')
+        </if>
+        <if test="hotelAddress!=null and hotelName!=''">
+            and hotelAddress like CONCAT('%',#{hotelAddress},'%')
+        </if>
+        <if test="id!=null and id!=''">
+            and b.orderId = #{id}
+        </if>
+    </select>
+
+    <select id="getHotelId" resultType="java.lang.Integer">
+        select id from hotel where hotelName=#{hotelName}
+    </select>
+
+    <resultMap id="hid" type="Bill">
+        <result property="hotelName" column="hotelName"/>
+    </resultMap>
+
+    <resultMap id="mid" type="HotelType">
+        <result property="hotelRoomType" column="hotelRoomType"/>
+        <result property="hotelPeople" column="hotelPeople"/>
+    </resultMap>
+
+    <update id="isCheckIn" parameterType="int">
+        update bill
+        <set>
+            <if test="flag!=null and flag!=''">isCheckIn=#{flag},</if>
+        </set>
+        where id=#{id}
+    </update>
+
+    <select id="getRoomType" resultType="java.lang.Integer">
+        select id from hotelType where hotelRoomType = #{hotelRoomType} LIMIT 1
+    </select>
+</mapper>

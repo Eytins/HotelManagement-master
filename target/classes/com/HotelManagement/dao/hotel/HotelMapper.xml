@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.HotelManagement.dao.hotel.HotelMapper">
+
+    <!--添加新的酒店-->
+    <insert id="addNewHotel" parameterType="Hotel">
+        insert into hotel(hotelName, hotelAddress, postCode, tel, creationDate, userId)
+        values (#{hotelName}, #{hotelAddress}, #{postCode}, #{tel}, #{creationDate}, #{userId})
+    </insert>
+
+    <!--搜索所有酒店名-->
+    <select id="searchHotel" resultType="com.HotelManagement.pojo.Hotel">
+        select * from hotel
+        where userId=#{userId}
+        <if test="hotelName!=null and hotelName!=''">
+            and hotelName like CONCAT('%',#{hotelName},'%')
+        </if>
+        <if test="hotelAddress!=null and hotelAddress!=''">
+            and hotelAddress like CONCAT('%',#{hotelAddress},'%')
+        </if>
+    </select>
+
+    <!--搜索所有酒店名-->
+    <select id="searchHotel2" resultType="com.HotelManagement.pojo.Hotel">
+        select * from hotel
+        where
+        <if test="hotelName!=null and hotelName!=''">
+            and hotelName like CONCAT('%',#{hotelName},'%')
+        </if>
+        <if test="hotelAddress!=null and hotelAddress!=''">
+            and hotelAddress like CONCAT('%',#{hotelAddress},'%')
+        </if>
+
+    </select>
+
+    <delete id="deleteHotelById" parameterType="int">
+        delete
+        from hotel
+        where id = #{id}
+    </delete>
+
+    <select id="searchBillByHotel" resultType="com.HotelManagement.pojo.Bill">
+        select * from bill
+        <where>
+            <if test="isPayment!=null and isPayment!=''">
+                isPayment = #{isPayment}
+            </if>
+            <if test="isCheckIn!=null and isCheckIn!=''">
+                and isCheckIn = #{isCheckIn}
+            </if>
+        </where>
+    </select>
+
+    <update id="checkIn" parameterType="int">
+        update HotelManagement.bill
+        set isCheckIn = 1
+        where id = #{billId}
+    </update>
+</mapper>
